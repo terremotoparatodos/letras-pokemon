@@ -258,7 +258,9 @@ body.debug #debug{display:block}
 .answer.a-shake{animation:shake .46s}
 .toast{grid-area:st; align-self:start; justify-self:center; z-index:6 !important; pointer-events:none; margin-top:-26px;
   padding:5px 12px 4px; border-radius:8px; border:3px solid var(--ink); background:#fff; color:var(--ink); font-size:15px; letter-spacing:.05em;
-  opacity:0; white-space:nowrap}
+  opacity:0; white-space:nowrap;
+  /* letra oscura sobre blanco: el contorno de .outline-s va en blanco, si no se empasta */
+  text-shadow:-2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff}
 .toast.show{animation:toast 1.8s both}
 @keyframes toast{0%{opacity:0; transform:translateY(6px)}12%{opacity:1; transform:none}80%{opacity:1}100%{opacity:0}}
 .status .count b{color:var(--ok-hi)}
