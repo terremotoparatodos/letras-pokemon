@@ -183,7 +183,8 @@ body.clean .virtual span, body.clean .virtual::after{display:none}
 .stamp{grid-area:grid; align-self:center; justify-self:center; z-index:5 !important; pointer-events:none; text-align:center;
   padding:18px 34px 14px; border-radius:16px; border:5px solid var(--ink); opacity:0; transform:scale(.4)}
 .stamp.perfect{background:var(--gold); color:var(--ink)}
-.stamp.bomb{background:var(--no); color:#fff}
+/* Bomba: borde blanco (con anillo oscuro por fuera) para que se lea sobre fondos oscuros */
+.stamp.bomb{background:var(--no); color:#fff; border-color:#fff; box-shadow:0 0 0 5px var(--ink), 0 8px 0 5px rgba(0,0,0,.45)}
 .stamp.final{background:var(--panel); color:var(--gold)}
 .stamp small{display:block; font-size:.42em; letter-spacing:.1em; margin-top:6px}
 .stamp.show{animation:stampIn 1.9s both}

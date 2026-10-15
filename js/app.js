@@ -241,7 +241,7 @@
   }
 
   function showStamp(kind, html) {
-    el.stamp.className = 'stamp';
+    el.stamp.className = 'stamp outline-s';
     el.stamp.innerHTML = html;
     void el.stamp.offsetWidth;
     if (kind === 'final') el.stamp.classList.add('final', 'stay');
