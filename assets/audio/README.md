@@ -1,12 +1,12 @@
-# Audio (opcional)
+# Audio
 
-El juego busca estos archivos. Si no existen, no suena nada (fallback silencioso):
+Efectos arcade originales (los mismos de Buscaminas Pokémon). Si alguno no carga, no suena nada (fallback silencioso):
 
 | Archivo          | Cuándo suena                        |
 |------------------|-------------------------------------|
-| `correct.mp3`    | al acertar un Pokémon               |
-| `bomb.mp3`       | al decir un Pokémon equivocado      |
-| `perfect.mp3`    | tablero completo                    |
-| `next-round.mp3` | al pasar a la ronda siguiente       |
+| `correct.wav`    | al acertar un Pokémon               |
+| `bomb.wav`       | al decir un Pokémon equivocado      |
+| `perfect.wav`    | tablero completo                    |
+| `next-round.wav` | al pasar a la ronda siguiente       |
 
 Las rutas se cambian en `js/config.js` (`audio`). Mute: botón 🔊 del panel o tecla `M`.

@@ -42,9 +42,9 @@ window.LETRAS_CONFIG = {
   minValid: 3,                // tableros con menos cartas no se usan
   fuzzy: true,                // acepta un error de tipeo (dos en nombres de 9+ letras)
   audio: {                    // si el archivo no existe, se ignora en silencio
-    correct: 'assets/audio/correct.mp3',
-    bomb: 'assets/audio/bomb.mp3',
-    perfect: 'assets/audio/perfect.mp3',
-    nextRound: 'assets/audio/next-round.mp3',
+    correct: 'assets/audio/correct.wav',
+    bomb: 'assets/audio/bomb.wav',
+    perfect: 'assets/audio/perfect.wav',
+    nextRound: 'assets/audio/next-round.wav',
   },
 };
