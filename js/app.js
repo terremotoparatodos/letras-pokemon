@@ -322,6 +322,12 @@
     },
     next: () => { if (G.next(S, IDX)) commit(); },
     retry: () => { if (G.retry(S, IDX)) commit(); },
+    reroll: () => {
+      const id = G.reroll(S, IDX);
+      if (!id) return;
+      preload(); commit();
+      pq('#p-msg').textContent = (`🎲 Nueva ronda: ${D.describeRound(IDX, id, OPTS).cat.label} · más ${id.endsWith(':min') ? 'corto' : 'largo'}`);
+    },
     skip: () => { if (G.next(S, IDX, { force: true })) commit(); },
     prev: () => { if (G.prev(S, IDX)) commit(); },
     swap: () => { G.setActive(S, 1 - S.active); commit(); },
@@ -372,6 +378,7 @@
     <section><h3>Partida</h3>
       <div class="muted">Seed <b id="p-seed"></b> · ronda <b id="p-round"></b> · <span id="p-ext"></span></div>
       <div class="line" style="margin-top:8px"><button id="b-prev" title="←">◀ Anterior</button><button id="b-retry" title="T">↺ Reintentar</button><button id="b-skip" title="→">Siguiente ▶</button></div>
+      <div class="line" style="margin-top:6px"><button id="b-reroll" title="C">🎲 Cambiar ronda (reserva)</button><span class="muted" id="p-reserve"></span></div>
       <label>Nueva partida (seed opcional, para reproducirla)</label>
       <div class="line"><input id="p-seed-in" placeholder="p. ej. 12345"><button class="danger" id="b-new">Nueva partida</button></div>
     </section>
@@ -386,7 +393,7 @@
     </section>
     <section id="debug"><h3>Debug</h3><div id="dbg"></div></section>
     <footer><kbd>R</kbd> grabación 1:1 · <kbd>G</kbd> guías · <kbd>P</kbd> panel · <kbd>M</kbd> mute · <kbd>D</kbd> debug<br>
-      <kbd>Enter</kbd>/<kbd>Espacio</kbd> continuar · <kbd>T</kbd> reintentar · <kbd>J</kbd> cambiar turno · <kbd>U</kbd> deshacer respuesta ·
+      <kbd>Enter</kbd>/<kbd>Espacio</kbd> continuar · <kbd>T</kbd> reintentar · <kbd>C</kbd> cambiar ronda (reserva) · <kbd>J</kbd> cambiar turno · <kbd>U</kbd> deshacer respuesta ·
       <kbd>←</kbd>/<kbd>→</kbd> ronda anterior/siguiente · <kbd>+</kbd>/<kbd>−</kbd> puntaje del jugador activo<br>
       Las teclas funcionan con la casilla de respuesta sin foco (<kbd>Esc</kbd> la suelta).</footer>`;
   const pq = s => panel.querySelector(s);
@@ -402,6 +409,7 @@
   pq('#b-prev').onclick = act.prev;
   pq('#b-retry').onclick = act.retry;
   pq('#b-skip').onclick = act.skip;
+  pq('#b-reroll').onclick = act.reroll;
   pq('#b-new').onclick = () => act.newMatch(pq('#p-seed-in').value.trim());
   pq('#b-swap').onclick = act.swap;
   pq('#b-undo').onclick = act.undo;
@@ -420,6 +428,10 @@
     pq('#p-round').textContent = `${S.index + 1}/${S.order.length}${S.finished ? ' (terminada)' : ''}`;
     pq('#p-ext').textContent = `${def.cat.label} · más ${def.ext === 'min' ? 'corto' : 'largo'}`;
     pq('#b-retry').disabled = !S.config.allowRetry;
+    const used = new Set(S.order.concat(S.rerolled || []));
+    const left = (S.config.reserve || []).filter(x => !used.has(x)).length;
+    pq('#b-reroll').disabled = S.finished;
+    pq('#p-reserve').textContent = `quedan ${left} en reserva`;
     pq('#p-answer').disabled = S.finished || r.status !== 'playing';
     pq('#p-log').textContent = r.log.length
       ? r.log.map(s => `${s.ok ? '✓' : '💣'} ${IDX.byId.get(s.id).name} (${P[s.player]})`).join(' · ')
@@ -469,6 +481,7 @@
       else if ($('#answer')) $('#answer').focus({ preventScroll: true });
     }
     else if (k === 't') { if (ended) act.retry(); }
+    else if (k === 'c') act.reroll();
     else if (k === 'j') act.swap();
     else if (k === 'u' || k === 'backspace') act.undo();
     else if (k === 'arrowright') act.skip();

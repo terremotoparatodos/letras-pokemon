@@ -162,3 +162,27 @@ test('misma seed = misma partida', () => {
   assert.deepEqual(a.round.cards, b.round.cards);
   assert.equal(new Set(a.order).size, a.order.length);
 });
+
+test('tipo acotado a Kanto–Sinnoh (type10g4): tablero, pregunta y bomba por región', () => {
+  const d = D.describeRound(IDX, 'type10g4:max', OPTS);
+  assert.equal(d.question, 'POKÉMON DE TIPO FUEGO DE KANTO A SINNOH CON EL NOMBRE MÁS LARGO');
+  assert.deepEqual(d.board.tiers[0].ids.map(name).sort(), ['Charmander', 'Charmeleon', 'Typhlosion']);
+  assert.ok(d.board.tiers.flat().every(t => t.ids.every(id => IDX.byId.get(id).gen <= 4)));
+  const s = matchAt('type10g4:max');
+  assert.equal(G.answer(s, IDX, 'Centiskorch').type, 'bomb');
+  assert.equal(s.round.bomb.reason, 'ES DE GALAR');
+  assert.throws(() => D.parseRoundId('gen1g4:min'));
+});
+
+test('rondas fijas (config.rounds) y reroll desde la reserva', () => {
+  const config = { rounds: ['gen1:min', 'type16g4:max', 'type99:min'], reserve: ['gen2:min', 'gen1:min', 'gen4:min'] };
+  const s = G.createMatch(IDX, DATA, { seed: 'r', config });
+  assert.deepEqual(s.order, ['gen1:min', 'type16g4:max']);
+  G.answer(s, IDX, 'mew');
+  assert.equal(G.reroll(s, IDX), 'gen2:min');
+  assert.deepEqual(s.scores, [0, 0]);
+  assert.equal(s.round.id, 'gen2:min');
+  assert.equal(G.reroll(s, IDX), 'gen4:min'); // gen1:min ya está en la partida
+  assert.ok(G.reroll(s, IDX)); // reserva agotada: sale una del banco
+  assert.ok(G.isValidState(JSON.parse(JSON.stringify(s)), IDX));
+});

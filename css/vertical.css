@@ -11,7 +11,7 @@
   --reel-w: 1080px;
 }
 
-/* SKY y GUTI quedan justo debajo de su cámara (izquierda / derecha) */
+/* HÉCTOR y GUTI quedan justo debajo de su cámara (izquierda / derecha) */
 #game{padding:22px 24px 24px;
   grid-template-columns:250px 1fr 250px;
   grid-template-rows:132px 16px 118px 64px 1fr;

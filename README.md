@@ -8,7 +8,7 @@ En cada ronda sale una región o un tipo y un objetivo: el nombre **más corto**
 Cada carta oculta es un Pokémon por descubrir. La Poké Ball muestra cuántas letras tiene y la
 inicial va en dorado.
 
-**Tablero compartido, como el Buscaminas en modo "un clic cada uno":** SKY y GUTI completan el
+**Tablero compartido, como el Buscaminas en modo "un clic cada uno":** HÉCTOR y GUTI completan el
 mismo tablero alternándose respuesta a respuesta.
 
 - **Acierto:** la carta se da vuelta con el sprite, suma 1 a quien lo dijo y pasa el turno.
@@ -22,6 +22,16 @@ mismo tablero alternándose respuesta a respuesta.
 Ejemplo: *Kanto, más corto* → Mew y Muk (3 letras) y, como son pocas, la **escalera** suma las de
 4 letras (Abra, Onix, Jynx, Seel). El primer escalón siempre es el extremo real de la categoría.
 
+## Rondas del video y reserva
+
+`js/config.js` fija las 10 rondas (con foco en Kanto–Sinnoh) y otras 10 de reserva. En el panel,
+**🎲 Cambiar ronda (reserva)** (tecla `C`) reemplaza la ronda actual por la siguiente de la reserva
+y devuelve los puntos de esa ronda; si la reserva se agota, sale una al azar del banco.
+
+Además de región y tipo, hay tipos **acotados a las primeras generaciones**: `type10g4` = tipo Fuego
+sólo de Kanto a Sinnoh ("POKÉMON DE TIPO FUEGO DE KANTO A SINNOH…"). Un Pokémon del tipo pero de
+una región posterior es bomba con el cartel "ES DE GALAR".
+
 ## Cómo se cuentan las letras
 
 Se cuentan **letras y números del nombre en español** (los mismos nombres de PokeDuelo). Espacios,
@@ -34,15 +44,15 @@ adivina: hay que escribirlo bien.
 
 ## Abrir
 
-**Jugar:** [vertical](https://titanterremoto.github.io/letras-pokemon/) ·
-[horizontal](https://titanterremoto.github.io/letras-pokemon/horizontal.html) ·
-[celular del jugador](https://titanterremoto.github.io/letras-pokemon/jugar.html)
+**Jugar:** [vertical](https://terremotoparatodos.github.io/letras-pokemon/) ·
+[horizontal](https://terremotoparatodos.github.io/letras-pokemon/horizontal.html) ·
+[celular del jugador](https://terremotoparatodos.github.io/letras-pokemon/jugar.html)
 
 | Versión | GitHub Pages | Local (`npm run serve`) | Doble clic |
 |---|---|---|---|
-| Vertical 1080×1982 | https://titanterremoto.github.io/letras-pokemon/ | http://localhost:8123/ | `index.html` |
-| Horizontal 1920×1080 | https://titanterremoto.github.io/letras-pokemon/horizontal.html | http://localhost:8123/horizontal.html | `horizontal.html` |
-| Celular del jugador | https://titanterremoto.github.io/letras-pokemon/jugar.html | http://localhost:8123/jugar.html | — |
+| Vertical 1080×1982 | https://terremotoparatodos.github.io/letras-pokemon/ | http://localhost:8123/ | `index.html` |
+| Horizontal 1920×1080 | https://terremotoparatodos.github.io/letras-pokemon/horizontal.html | http://localhost:8123/horizontal.html | `horizontal.html` |
+| Celular del jugador | https://terremotoparatodos.github.io/letras-pokemon/jugar.html | http://localhost:8123/jugar.html | — |
 
 Para jugar en una sola pantalla no hace falta servidor ni Internet: datos, sprites, fuentes y fondo
 están en el proyecto. La sala en línea sí necesita Internet (ver abajo).
@@ -60,7 +70,7 @@ intenciones o miran.
 
 1. En el panel de la pantalla principal: **🌐 Crear sala en línea**. Aparece un código de 5 letras.
 2. **Jugadores:** cada uno abre el enlace de jugador (`jugar.html?sala=CÓDIGO`) en su celular y elige
-   su lado (SKY o GUTI). Responde sólo en su turno, y mientras escribe, **lo que escribe se ve en la
+   su lado (HÉCTOR o GUTI). Responde sólo en su turno, y mientras escribe, **lo que escribe se ve en la
    pantalla principal y en los espectadores**. Si recarga o se corta, recupera su lado solo. Los
    lados sin celular se siguen jugando desde la pantalla principal.
 3. **Espectadores** (otro stream, OBS): enlace vertical (`index.html?espectador=CÓDIGO`) u horizontal
@@ -119,7 +129,8 @@ El panel tiene además la lista de lo dicho en la ronda y la **solución** (ocul
 
 ## Configuración (`js/config.js`)
 
-`players` (SKY, GUTI), `startingPlayer`, `totalRounds` (12; el banco tiene 48), `allowRetry`,
+`players` (HÉCTOR, GUTI), `startingPlayer`, `rounds` (las 10 rondas del video, en orden), `reserve`
+(10 de reserva para el botón 🎲), `totalRounds` (sólo si `rounds` es `null`: salen al azar del banco), `allowRetry`,
 `perfectBonus`, `bombPenalty`, `keepPointsOnBomb`, `minCards`/`maxCards` (escalera de 6 a 12 cartas),
 `minValid`, `fuzzy`, rutas de `audio` (mismos archivos opcionales que el Buscaminas).
 

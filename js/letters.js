@@ -47,7 +47,13 @@
       ...TYPES.map((label, i) => ({ id: categoryId('type', i + 1), kind: 'type', value: i + 1, label })),
     ];
   }
-  const inCategory = (p, cat) => cat.kind === 'gen' ? p.gen === cat.value : p.types.includes(cat.value);
+  /* Tipo acotado a las primeras generaciones: "type10g4" = Fuego de Kanto a Sinnoh (gen ≤ 4). */
+  function scoped(cat, maxGen) {
+    if (!maxGen) return cat;
+    return Object.assign({}, cat, { id: `${cat.id}g${maxGen}`, maxGen, label: `${cat.label} (${REGIONS[0]}–${REGIONS[maxGen - 1]})` });
+  }
+  const inCategory = (p, cat) => cat.kind === 'gen' ? p.gen === cat.value
+    : p.types.includes(cat.value) && (!cat.maxGen || p.gen <= cat.maxGen);
 
   /* ─── Tablero de una ronda ───
      El primer escalón es siempre el extremo (el nombre más corto o más largo).
@@ -68,13 +74,14 @@
     return { pool: pool.length, tiers, total, valid: total >= opts.minValid && total <= maxCards };
   }
 
+  const D_up = s => s.toLocaleUpperCase('es');
   const roundId = (cat, ext) => `${cat.id}:${ext}`;
   function parseRoundId(id) {
-    const m = /^(gen|type)(\d+):(min|max)$/.exec(id);
-    if (!m) throw new Error(`Ronda desconocida: ${id}`);
+    const m = /^(gen|type)(\d+)(?:g([1-8]))?:(min|max)$/.exec(id);
+    if (!m || (m[1] === 'gen' && m[3])) throw new Error(`Ronda desconocida: ${id}`);
     const cat = categories().find(c => c.kind === m[1] && c.value === +m[2]);
     if (!cat) throw new Error(`Ronda desconocida: ${id}`);
-    return { cat, ext: m[3] };
+    return { cat: scoped(cat, m[3] ? +m[3] : 0), ext: m[4] };
   }
 
   /* Todas las rondas jugables con estas opciones (las que no entran en la grilla se descartan). */
@@ -90,8 +97,9 @@
   function describeRound(index, id, opts) {
     const { cat, ext } = parseRoundId(id);
     const board = buildBoard(index, cat, ext, opts);
-    const label = cat.label.toLocaleUpperCase('es');
-    const where = cat.kind === 'gen' ? `DE ${label}` : `DE TIPO ${label}`;
+    const base = D_up(cat.kind === 'gen' ? REGIONS[cat.value - 1] : TYPES[cat.value - 1]);
+    const where = cat.kind === 'gen' ? `DE ${base}`
+      : `DE TIPO ${base}${cat.maxGen ? ` DE ${D_up(REGIONS[0])} A ${D_up(REGIONS[cat.maxGen - 1])}` : ''}`;
     const lens = board.tiers.map(t => t.len);
     return {
       id, cat, ext, board,

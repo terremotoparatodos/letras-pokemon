@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
    LETRAS POKÉMON · LÓGICA DE PARTIDA (sin DOM)
    Mismas reglas que Buscaminas Pokémon en modo "un clic cada uno":
-   SKY y GUTI completan el MISMO tablero alternándose respuesta a respuesta.
+   HÉCTOR y GUTI completan el MISMO tablero alternándose respuesta a respuesta.
    · Acierto: +1 para quien lo nombró, se da vuelta la carta y pasa el turno.
    · Error (otro largo u otra categoría) = BOMBA: termina la ronda y se revela todo.
    · Nombre inexistente o ya dicho: no cuenta, sigue el mismo jugador.
@@ -16,14 +16,23 @@
   'use strict';
 
   const DEFAULTS = {
-    players: ['SKY', 'GUTI'], startingPlayer: 0, totalRounds: 12, allowRetry: true,
+    players: ['HÉCTOR', 'GUTI'], startingPlayer: 0, totalRounds: 12, allowRetry: true,
+    rounds: null, reserve: [],
     perfectBonus: 0, bombPenalty: 0, keepPointsOnBomb: true,
     minCards: 6, maxCards: 12, minValid: 3, fuzzy: true,
   };
   const boardOpts = cfg => ({ minCards: cfg.minCards, maxCards: cfg.maxCards, minValid: cfg.minValid });
 
   /* Orden de rondas: sin repetir, sin la misma categoría seguida y alternando corto/largo cuando se puede. */
+  const playable = (index, id, cfg) => {
+    try { return D.describeRound(index, id, boardOpts(cfg)).board.valid; } catch (_) { return false; }
+  };
   function buildOrder(index, seed, cfg) {
+    // Rondas elegidas a mano (config.rounds): se juegan en ese orden; la seed sólo reparte las cartas.
+    if (Array.isArray(cfg.rounds) && cfg.rounds.length) {
+      const fixed = [...new Set(cfg.rounds)].filter(id => playable(index, id, cfg));
+      if (fixed.length) return fixed.slice(0, 60);
+    }
     const rand = D.rng(`${seed}:order`);
     const pool = D.shuffle(D.roundBank(index, boardOpts(cfg)), rand);
     const n = Math.min(cfg.totalRounds, pool.length);
@@ -84,6 +93,7 @@
   function bombReason(index, p, roundId, cfg) {
     const def = D.describeRound(index, roundId, boardOpts(cfg));
     if (!D.inCategory(p, def.cat)) {
+      if (def.cat.maxGen && p.types.includes(def.cat.value)) return `ES DE ${D.REGIONS[p.gen - 1].toLocaleUpperCase('es')}`;
       return def.cat.kind === 'gen'
         ? `ES DE ${D.REGIONS[p.gen - 1].toLocaleUpperCase('es')}`
         : `ES ${p.types.map(t => D.TYPES[t - 1].toLocaleUpperCase('es')).join('/')}`;
@@ -187,6 +197,25 @@
     return true;
   }
 
+  /* REROLL (admin): cambia la ronda actual por la siguiente de la reserva (config.reserve)
+     que no se haya usado. Si la reserva se agotó, sale una al azar del banco. */
+  function reroll(state, index) {
+    if (state.finished) return null;
+    const used = new Set(state.order.concat(state.rerolled || []));
+    let id = (state.config.reserve || []).find(x => !used.has(x) && playable(index, x, state.config));
+    if (!id) {
+      const rand = D.rng(`${state.seed}:reroll:${state.index}:${used.size}`);
+      id = D.shuffle(D.roundBank(index, boardOpts(state.config)).filter(x => !used.has(x)), rand)[0];
+    }
+    if (!id) return null;
+    state.rerolled = (state.rerolled || []).concat(state.order[state.index]).slice(-60);
+    state.order[state.index] = id;
+    state.scores = state.round.scoresBefore.slice();
+    state.history = state.history.filter(h => h.index !== state.index);
+    state.round = freshRound(state, index, 0);
+    return id;
+  }
+
   function setActive(state, player) {
     if (player !== 0 && player !== 1) return false;
     state.active = player;
@@ -219,6 +248,7 @@
       if (!Array.isArray(s.order) || !s.order.length || s.order.length > 60) return false;
       s.order.forEach(id => D.parseRoundId(id));
       if (!int(s.index) || s.index < 0 || s.index >= s.order.length || !pair(s.scores) || !seat(s.active) || typeof s.finished !== 'boolean') return false;
+      if (s.rerolled !== undefined && !(Array.isArray(s.rerolled) && s.rerolled.length <= 60 && s.rerolled.every(x => str(x, 20)))) return false;
       if (!Array.isArray(s.history) || s.history.length > 60 || !s.history.every(h => h && int(h.index) && pair(h.pointsBy)
         && ['perfect', 'bomb'].includes(h.result) && (h.bomber === null || seat(h.bomber)))) return false;
       const r = s.round;
@@ -232,5 +262,5 @@
     } catch (_) { return false; }
   }
 
-  return { DEFAULTS, boardOpts, buildOrder, dealCards, createMatch, answer, undo, retry, next, prev, setActive, adjustScore, resetScores, winner, isValidState };
+  return { DEFAULTS, boardOpts, buildOrder, dealCards, createMatch, answer, undo, retry, reroll, next, prev, setActive, adjustScore, resetScores, winner, isValidState };
 });
