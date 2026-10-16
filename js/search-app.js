@@ -26,7 +26,7 @@
     $('#layout').textContent = vertical ? '↔ Horizontal' : '↕ Vertical';
     const url = new URL(location.href);
     if (vertical) url.searchParams.set('vista', 'vertical'); else url.searchParams.delete('vista');
-    history.replaceState(null, '', url);
+    if (location.protocol !== 'file:') history.replaceState(null, '', url);
     fit();
   }
   function updateMute() {
@@ -35,7 +35,9 @@
     $('#mute').setAttribute('aria-pressed', String(A.isMuted()));
   }
   function render() {
-    const s = state(), finished = s.revealed || s.found.length === 10;
+    const s = state(), finished = s.revealed || s.found.length === 10 || s.lives === 0;
+    $('#lives').textContent = '♥'.repeat(s.lives) + '♡'.repeat(3 - s.lives);
+    $('#lives').setAttribute('aria-label', `${s.lives} de 3 vidas`);
     $('#type-title').textContent = `TIPO ${D.TYPES[selected].toUpperCase()}`;
     $('#type-title').style.color = D.TYPE_COLORS[selected];
     $('#found-count').textContent = `${s.found.length} / 10`;
@@ -58,15 +60,16 @@
     $('#pokemon-answer').disabled = !ready || finished;
     $('#search-answer button').disabled = !ready || finished;
     $('#undo').disabled = !ready || !session().history.length;
-    $('#reveal').disabled = !ready || finished;
+    $('#reveal').disabled = !ready || s.revealed || s.found.length === 10;
     $('#next').disabled = !ready;
   }
   function choose(type) {
     selected = type;
     $('#pokemon-answer').value = '';
-    const url = new URL(location.href); url.searchParams.set('tipo', String(type + 1)); history.replaceState(null, '', url);
+    const url = new URL(location.href); url.searchParams.set('tipo', String(type + 1));
+    if (location.protocol !== 'file:') history.replaceState(null, '', url);
     render();
-    message(state().revealed ? 'Esta ronda ya fue revelada.' : '¡Adiviná los diez puestos!');
+    message(state().revealed ? 'Esta ronda ya fue revelada.' : state().lives === 0 ? 'Sin vidas. Pueden revelar las respuestas desde el panel.' : '¡Adiviná los diez puestos!');
     if (ready) A.play('nextRound');
   }
   D.TYPES.forEach((type, i) => {
@@ -85,7 +88,10 @@
     if (result.kind === 'correct' || result.kind === 'perfect') {
       A.play(result.kind);
       message(result.kind === 'perfect' ? '¡TOP 10 COMPLETO!' : `¡Acierto! Puesto ${result.rank + 1}`, 'good');
-    } else if (result.kind === 'miss') { A.play('bomb'); message('No está en este top 10. ¡Sigan intentando!', 'bad'); }
+    } else if (result.kind === 'miss') {
+      A.play('bomb');
+      message(state().lives === 0 ? '¡Sin vidas! Ronda terminada. Las respuestas siguen ocultas.' : `No está en este top 10. Quedan ${state().lives} ${state().lives === 1 ? 'vida' : 'vidas'}.`, 'bad');
+    }
     else if (result.kind === 'repeat') message('Esa respuesta ya se intentó. Probá otra.');
     else if (result.kind === 'empty') message('Escribí el nombre de un Pokémon.');
     $('#pokemon-answer').focus();
@@ -118,9 +124,8 @@
   });
   layout(params.get('vista') === 'vertical'); updateMute(); render();
   try {
-    const response = await fetch('data/search-2026.json');
-    if (!response.ok) throw Error('No se pudo descargar el ranking.');
-    const data = await response.json();
+    const data = window.SEARCH_2026;
+    if (!data) throw Error('No se pudo cargar el ranking.');
     if (data.meta.period !== '2026-01/2026-07' || data.scores.length !== data.meta.coverage) throw Error('Cobertura de datos inesperada.');
     boards = G.rankings(window.LETRAS_DATA.pokemon, data.scores);
     if (boards.some(board => board.length !== 10)) throw Error('Faltan puestos del ranking.');

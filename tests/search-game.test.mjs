@@ -18,9 +18,10 @@ test('cooperative guesses reveal a rank without mutating history or tracking sco
   const second = G.guess(result.state, board, 'Test 9');
   assert.deepEqual(second.state.found, [0, 9]);
 });
-test('misses track attempts only; repeats and empty input keep state', () => {
+test('misses cost one life; repeats and empty input keep state', () => {
   const miss = G.guess(G.create(), board, 'no existe');
   assert.equal(miss.kind, 'miss');
+  assert.equal(miss.state.lives, 2);
   assert.deepEqual(miss.state.attempts, ['noexiste']);
   assert.deepEqual(miss.state.found, []);
   assert.equal(G.guess(miss.state, board, 'no-existe').state, miss.state);
@@ -50,6 +51,8 @@ test('snapshot has ten valid unique entries for every type and matching local sp
   const context = { window: {} };
   vm.runInNewContext(fs.readFileSync(new URL('../data/game-data.js', import.meta.url), 'utf8'), context);
   const data = JSON.parse(fs.readFileSync(new URL('../data/search-2026.json', import.meta.url), 'utf8'));
+  vm.runInNewContext(fs.readFileSync(new URL('../data/search-2026.js', import.meta.url), 'utf8'), context);
+  assert.equal(JSON.stringify(context.window.SEARCH_2026), JSON.stringify(data), 'Generated script and JSON must agree');
   assert.equal(data.meta.period, '2026-01/2026-07');
   assert.equal(data.scores.length, 1021);
   const ranks = G.rankings(context.window.LETRAS_DATA.pokemon, data.scores);
@@ -59,4 +62,18 @@ test('snapshot has ten valid unique entries for every type and matching local sp
     assert.equal(new Set(rank.map(p => p.id)).size, 10);
     for (const p of rank) assert.equal(fs.existsSync(new URL(`../assets/sprites/${p.id}.png`, import.meta.url)), true, 'Missing ranking sprite (answer hidden)');
   }
+});
+
+test('three misses end the round without revealing answers; lives are independent by type', () => {
+  let s = G.create();
+  for (const word of ['fallo uno', 'fallo dos', 'fallo tres']) s = G.guess(s, board, word).state;
+  assert.equal(s.lives, 0);
+  assert.equal(s.revealed, false);
+  assert.deepEqual(s.found, []);
+  assert.equal(G.guess(s, board, 'Test 0').kind, 'closed');
+  assert.equal(G.create(1).lives, 3);
+  const before = G.create();
+  const hit = G.guess(before, board, 'Test 0');
+  assert.equal(hit.state.lives, 3);
+  assert.equal(before.lives, 3);
 });

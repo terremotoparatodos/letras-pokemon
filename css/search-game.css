@@ -30,3 +30,5 @@ body.recording{overflow:auto}body.recording #search-reel{position:relative;left:
 #control-panel footer{margin:18px 0 14px;gap:8px}#control-panel #reveal{margin-left:0}#control-panel .source{font:13px system-ui,sans-serif}#control-panel .source[open]{padding:10px}
 .play-area{padding:0 90px}.play-area header{font-size:32px}.prompt h1{font-size:32px}.prompt{padding:12px}#ranking{gap:10px 16px}.rank-name{font-size:28px}.rank-number{font-size:32px}.rank-card img{width:70px;height:70px}.rank-card .mystery{font-size:32px}
 body.vertical .play-area{padding:0}body.vertical #search-answer{flex-wrap:wrap}body.vertical .answer-label{flex-basis:100%}body.vertical #ranking{gap:14px}body.vertical .rank-name{font-size:25px}
+
+.header-meta{display:flex;align-items:center;gap:24px}#lives{color:#ff6475;font:34px/1 system-ui,sans-serif;letter-spacing:6px;text-shadow:2px 2px #16161f}

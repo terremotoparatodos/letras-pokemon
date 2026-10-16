@@ -14,10 +14,10 @@
       .slice(0, 10).map(p => ({ id: p[0], name: p[1], english: p[2] })));
   }
   function create(type = 0) {
-    return { type, found: [], attempts: [], revealed: false };
+    return { type, found: [], attempts: [], lives: 3, revealed: false };
   }
   function guess(state, board, input) {
-    if (state.revealed || state.found.length === 10) return { kind: 'closed', state };
+    if (state.revealed || state.found.length === 10 || state.lives === 0) return { kind: 'closed', state };
     const key = normalize(input);
     if (!key) return { kind: 'empty', state };
     if (state.attempts.includes(key)) return { kind: 'repeat', state };
@@ -27,6 +27,7 @@
     if (rank >= 0 && state.found.includes(rank)) return { kind: 'repeat', state };
     const next = { ...state, found: [...state.found], attempts: [...state.attempts, key] };
     if (rank < 0) {
+      next.lives--;
       return { kind: 'miss', state: next };
     }
     next.found.push(rank);
