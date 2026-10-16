@@ -179,3 +179,17 @@ Pruebas: `npm test`. Regeneración del conjunto: `python scripts/build-search-ra
 
 Cada tipo comienza con 5 vidas; una respuesta incorrecta consume una. Repetir o enviar vacío no consume vidas. Al agotarlas termina la ronda sin revelar respuestas; deshacer restaura la vida.
 El HTML puede abrirse directamente desde el disco: el conjunto se carga como script generado (`data/search-2026.js`), sin fetch ni servidor. JSON y JS se generan juntos desde la misma fuente.
+
+## Espectador sincronizado del Top 10
+
+En la partida principal: P → Crear enlace vertical → Abrir vertical de espectador.
+El enlace también se puede copiar a otro navegador o a una fuente de navegador de OBS.
+Mantener abierta la partida principal. Al recargarla se debe crear un enlace nuevo.
+La vista vertical conserva 1080×1982 y las zonas 78/650/984/270.
+El espectador sigue el tipo, las cinco vidas, respuestas escritas, los puestos ya
+acertados y deshacer. No puede responder, cambiar tipos ni revelar respuestas.
+Solo se transmiten nombres de puestos que la partida ya muestra.
+Las pestañas del mismo navegador usan BroadcastChannel; otros navegadores usan
+PeerJS (la misma librería incluida para Letras). La conexión entre navegadores
+requiere internet y que la red permita WebRTC. Si se interrumpe, la vista avisa
+y vuelve a conectarse; al recargar el espectador recibe el estado actual.

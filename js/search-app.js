@@ -5,6 +5,8 @@
   const D = window.LetrasDomain, G = window.SearchGame, A = window.BMAudio;
   const sessions = Array.from({ length: 18 }, (_, type) => ({ state: G.create(type), history: [] }));
   const params = new URLSearchParams(location.search);
+  const spectator = params.get('espectador');
+  let sync = null;
   let selected = Math.max(0, Math.min(17, Math.trunc(Number(params.get('tipo')) || 1) - 1));
   let boards, ready = false;
   const session = () => sessions[selected];
@@ -14,6 +16,7 @@
   function message(text, kind = '') {
     $('#feedback').textContent = text;
     $('#feedback').className = kind;
+    if (sync && !spectator) sync.publish();
   }
   function fit() {
     const vertical = document.body.classList.contains('vertical');
@@ -57,13 +60,15 @@
       }
       list.append(li);
     }
-    $('#pokemon-answer').disabled = !ready || finished;
-    $('#search-answer button').disabled = !ready || finished;
-    $('#undo').disabled = !ready || !session().history.length;
-    $('#reveal').disabled = !ready || s.revealed || s.found.length === 10;
-    $('#next').disabled = !ready;
+    $('#pokemon-answer').disabled = !!spectator || !ready || finished;
+    $('#search-answer button').disabled = !!spectator || !ready || finished;
+    $('#undo').disabled = !!spectator || !ready || !session().history.length;
+    $('#reveal').disabled = !!spectator || !ready || s.revealed || s.found.length === 10;
+    $('#next').disabled = !!spectator || !ready;
+    document.querySelectorAll('#type-filter button').forEach(button => { button.disabled = !!spectator; });
   }
   function choose(type) {
+    if (spectator) return;
     selected = type;
     $('#pokemon-answer').value = '';
     const url = new URL(location.href); url.searchParams.set('tipo', String(type + 1));
@@ -78,7 +83,7 @@
     $('#type-filter').append(button);
   });
   $('#search-answer').addEventListener('submit', event => {
-    event.preventDefault(); if (!ready) return;
+    event.preventDefault(); if (!ready || spectator) return;
     const result = G.guess(state(), boards[selected], $('#pokemon-answer').value);
     if (result.state !== state()) {
       session().history.push(state()); session().state = result.state;
@@ -108,6 +113,33 @@
   $('#layout').addEventListener('click', () => layout(!document.body.classList.contains('vertical')));
   $('#guides').addEventListener('click', () => document.body.classList.toggle('clean'));
   $('#record').addEventListener('click', () => { document.body.classList.toggle('recording'); fit(); });
+  function snapshot() {
+    const s = state();
+    const visible = s.revealed ? Array.from({ length: 10 }, (_, i) => i) : s.found;
+    return { type: selected, lives: s.lives, found: [...s.found], revealed: s.revealed,
+      cards: visible.map(rank => ({ rank, id: boards[selected][rank].id, name: boards[selected][rank].name })),
+      text: $('#feedback').textContent, kind: $('#feedback').className, typing: $('#pokemon-answer').value };
+  }
+  function networkStatus(text) {
+    $('#spectator-status').textContent = text;
+    if (spectator) {
+      $('#connection-notice').textContent = text === 'Conectado a la partida' ? '' : text;
+      $('#connection-notice').hidden = text === 'Conectado a la partida';
+    }
+  }
+  $('#spectator-start').addEventListener('click', () => {
+    if (spectator || !ready || sync) return;
+    const code = Array.from(crypto.getRandomValues(new Uint8Array(12)), n => n.toString(16).padStart(2, '0')).join('');
+    const url = new URL(location.href);
+    url.searchParams.set('espectador', code); url.searchParams.set('vista', 'vertical');
+    $('#spectator-link').href = url.href; $('#spectator-link').hidden = false;
+    $('#spectator-url').value = url.href; $('#spectator-url').hidden = false;
+    $('#spectator-start').disabled = true;
+    sync = window.SearchSync.connect({ code, watch: false, snapshot, status: networkStatus });
+    sync.publish();
+  });
+  $('#pokemon-answer').addEventListener('input', () => { if (sync && !spectator) sync.publish(); });
+  window.addEventListener('pagehide', () => { if (sync) sync.close(); });
   window.addEventListener('resize', fit);
   function togglePanel() {
     const panel = $('#control-panel');
@@ -122,7 +154,28 @@
     if (event.key.toLowerCase() === 'm') $('#mute').click();
     if (event.key.toLowerCase() === 'u' && !$('#undo').disabled) $('#undo').click();
   });
-  layout(params.get('vista') === 'vertical'); updateMute(); render();
+  layout(spectator ? params.get('vista') !== 'horizontal' : params.get('vista') === 'vertical'); updateMute(); render();
+  if (spectator) {
+    document.body.classList.add('spectator');
+    $('.answer-label').textContent = 'RESPUESTA EN JUEGO';
+    message(''); networkStatus('Conectando con la partida…');
+    if (!window.SearchSync.validCode(spectator)) { networkStatus('Enlace de espectador inválido. Creá uno desde el panel de la partida.'); return; }
+    let lastFound = 0, lastLives = 5, lastType = null;
+    sync = window.SearchSync.connect({ code: spectator, watch: true, status: networkStatus, receive(data) {
+      selected = data.type;
+      session().state = { ...G.create(selected), found: data.found, lives: data.lives, revealed: data.revealed };
+      boards = Array.from({ length: 18 }, () => Array(10).fill(null));
+      data.cards.forEach(p => { boards[selected][p.rank] = p; });
+      ready = true; render(); $('#pokemon-answer').value = data.typing; message(data.text, data.kind);
+      if (lastType !== null) {
+        if (lastType !== selected) A.play('nextRound');
+        else if (data.found.length > lastFound) A.play(data.found.length === 10 ? 'perfect' : 'correct');
+        else if (data.lives < lastLives) A.play('bomb');
+      }
+      lastType = selected; lastFound = data.found.length; lastLives = data.lives;
+    } });
+    return;
+  }
   try {
     const data = window.SEARCH_2026;
     if (!data) throw Error('No se pudo cargar el ranking.');

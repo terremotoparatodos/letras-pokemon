@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/search-game.css">
 </head>
 <body class="search-mode clean">
+<div id="connection-notice" role="status" hidden></div>
 <main id="search-reel">
   <div class="recording-banner banner-top" aria-hidden="true"><span>BANNER · 1080×78</span></div>
   <div class="camera-space"><span>ESPACIO PARA CÁMARAS</span></div>
@@ -26,6 +27,7 @@
 </main>
 <aside id="control-panel" aria-label="Panel de control" hidden><header><h2>Panel de control</h2><button id="close-panel" aria-label="Cerrar panel">Cerrar · P</button></header><h3>Elegir tipo</h3>      <nav id="type-filter" aria-label="Elegir tipo"></nav>
       <footer><button id="undo" disabled>Deshacer</button><button id="reveal" disabled>Revelar respuestas…</button><button id="next" disabled>Siguiente tipo →</button><button id="mute" aria-label="Silenciar sonidos">🔊</button><button id="layout">↕ Vertical</button><button id="guides">Cámaras</button><button id="record">Tamaño grabación</button></footer>
+      <section id="spectator-controls"><h3>Espectador sincronizado</h3><button id="spectator-start">Crear enlace vertical</button><p id="spectator-status" role="status">Sin espectador</p><a id="spectator-link" target="_blank" rel="noopener" hidden>Abrir vertical de espectador ↗</a><input id="spectator-url" aria-label="Enlace de espectador para copiar" readonly hidden><p>Mantené la partida principal abierta. Al recargarla, creá un enlace nuevo.</p></section>
       <details class="source"><summary>Fuente y reglas · sin respuestas</summary><p>Google Trends, enero–julio de 2026: promedio de interés relativo, no cantidad absoluta de búsquedas. Datos de PokéTrends (CC BY 4.0). La metodología declara consultas globales; sus metadatos también mencionan EE. UU., por lo que la cobertura geográfica del proveedor es ambigua. Se incluyen 1.021 especies con los siete meses completos; cuatro carecen de datos de 2026 y se excluyen, sin formas alternativas; los de doble tipo participan en ambos. Empates: número de Pokédex ascendente. Reto cooperativo, sin turnos ni puntajes. Adivinen los diez puestos entre todos. Cada tipo conserva su partida durante esta sesión.</p><p><a href="https://poke-trends.com/methodology" target="_blank" rel="noreferrer">Metodología del proveedor (puede contener spoilers)</a></p></details></aside>
 <dialog id="reveal-confirm"><h2>¿Revelar este top 10?</h2><p>Se mostrarán todas las respuestas de este tipo y terminará la ronda.</p><button id="cancel-reveal">Seguir jugando</button><button id="confirm-reveal">Sí, revelar respuestas</button></dialog>
 <script src="data/game-data.js"></script>
@@ -33,6 +35,8 @@
 <script src="js/letters.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/search-game.js"></script>
+<script src="vendor/peerjs.min.js"></script>
+<script src="js/search-sync.js"></script>
 <script src="js/search-app.js"></script>
 </body>
 </html>
