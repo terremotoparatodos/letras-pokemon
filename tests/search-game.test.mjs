@@ -7,25 +7,26 @@ const require = createRequire(import.meta.url);
 const G = require('../js/search-game.js');
 const board = Array.from({ length: 10 }, (_, i) => ({ id: 2000 + i, name: `Prueba ${i}`, english: `Test ${i}` }));
 
-test('correct guesses award points by rank and alternate players without mutating history', () => {
+test('cooperative guesses reveal a rank without mutating history or tracking scores', () => {
   const start = G.create();
   const result = G.guess(start, board, 'PRUÉBA 0');
   assert.equal(result.kind, 'correct');
-  assert.deepEqual(result.state.scores, [10, 0]);
-  assert.equal(result.state.turn, 1);
+  assert.equal(result.rank, 0);
+  assert.equal('scores' in result.state, false);
+  assert.equal('turn' in result.state, false);
   assert.deepEqual(start.found, []);
   const second = G.guess(result.state, board, 'Test 9');
-  assert.deepEqual(second.state.scores, [10, 1]);
+  assert.deepEqual(second.state.found, [0, 9]);
 });
-test('misses change turn without subtracting points; repeats and empty input keep state', () => {
+test('misses track attempts only; repeats and empty input keep state', () => {
   const miss = G.guess(G.create(), board, 'no existe');
   assert.equal(miss.kind, 'miss');
-  assert.deepEqual(miss.state.misses, [1, 0]);
-  assert.deepEqual(miss.state.scores, [0, 0]);
+  assert.deepEqual(miss.state.attempts, ['noexiste']);
+  assert.deepEqual(miss.state.found, []);
   assert.equal(G.guess(miss.state, board, 'no-existe').state, miss.state);
   assert.equal(G.guess(miss.state, board, ' ').state, miss.state);
 });
-test('aliases cannot earn points twice', () => {
+test('aliases cannot reveal the same rank twice', () => {
   const hit = G.guess(G.create(), board, 'Prueba 0');
   assert.equal(G.guess(hit.state, board, 'Test 0').kind, 'repeat');
   assert.equal(G.guess(hit.state, board, 'Test 0').state, hit.state);
@@ -34,7 +35,7 @@ test('completed and explicitly revealed rounds reject further guesses', () => {
   let s = G.create();
   for (let i = 0; i < 10; i++) s = G.guess(s, board, `Test ${i}`).state;
   assert.equal(s.found.length, 10);
-  assert.equal(s.scores[0] + s.scores[1], 55);
+  assert.equal(new Set(s.found).size, 10);
   assert.equal(G.guess(s, board, 'Test 0').kind, 'closed');
   assert.equal(G.guess({ ...G.create(), revealed: true }, board, 'Test 0').kind, 'closed');
 });

@@ -11,4 +11,4 @@
 
 ## Reglas de juego
 
-Héctor y Guti se alternan después de cada respuesta válida o pase. Un acierto en el puesto 1 suma 10 puntos; en el puesto 10, 1 punto. Los fallos no descuentan. Repetir una respuesta o enviar vacío no consume turno. Cada tipo mantiene su propia ronda durante la sesión. Recargar inicia una sesión nueva. Revelar requiere confirmación y termina esa ronda; deshacer recupera la acción anterior.
+Reto cooperativo sin nombres, turnos ni puntajes. Cada acierto descubre su puesto; los fallos permiten seguir intentando. El panel de tipos y controles se abre y cierra con P, fuera del campo de respuesta. Cada tipo mantiene su propia ronda durante la sesión. Recargar inicia una sesión nueva. Revelar requiere confirmación y termina esa ronda; deshacer recupera la acción anterior.

@@ -3,7 +3,6 @@
   'use strict';
   const $ = selector => document.querySelector(selector);
   const D = window.LetrasDomain, G = window.SearchGame, A = window.BMAudio;
-  const names = ['HÉCTOR', 'GUTI'];
   const sessions = Array.from({ length: 18 }, (_, type) => ({ state: G.create(type), history: [] }));
   const params = new URLSearchParams(location.search);
   let selected = Math.max(0, Math.min(17, Math.trunc(Number(params.get('tipo')) || 1) - 1));
@@ -40,12 +39,6 @@
     $('#type-title').textContent = `TIPO ${D.TYPES[selected].toUpperCase()}`;
     $('#type-title').style.color = D.TYPE_COLORS[selected];
     $('#found-count').textContent = `${s.found.length} / 10`;
-    $('#turn-label').textContent = finished ? 'RONDA TERMINADA' : `TURNO DE ${names[s.turn]}`;
-    document.querySelectorAll('.contestant').forEach((el, i) => {
-      el.classList.toggle('active', !finished && s.turn === i);
-      el.querySelector('.score').textContent = s.scores[i];
-      el.querySelector('.misses').textContent = `${s.misses[i]} fallos`;
-    });
     document.querySelectorAll('#type-filter button').forEach((el, i) => el.setAttribute('aria-pressed', String(selected === i)));
     const list = $('#ranking');
     list.replaceChildren();
@@ -57,7 +50,6 @@
         li.classList.add(s.found.includes(rank) ? 'solved' : 'revealed');
         const image = document.createElement('img'); image.src = `assets/sprites/${p.id}.png`; image.alt = ''; li.append(image);
         const name = document.createElement('span'); name.className = 'rank-name'; name.textContent = p.name; li.append(name);
-        const points = document.createElement('span'); points.className = 'rank-points'; points.textContent = `${10 - rank} PT`; li.append(points);
       } else {
         const hidden = document.createElement('span'); hidden.className = 'mystery'; hidden.textContent = '? ? ?'; hidden.setAttribute('aria-label', 'Puesto oculto'); li.append(hidden);
       }
@@ -65,7 +57,6 @@
     }
     $('#pokemon-answer').disabled = !ready || finished;
     $('#search-answer button').disabled = !ready || finished;
-    $('#pass').disabled = !ready || finished;
     $('#undo').disabled = !ready || !session().history.length;
     $('#reveal').disabled = !ready || finished;
     $('#next').disabled = !ready;
@@ -93,14 +84,11 @@
     render();
     if (result.kind === 'correct' || result.kind === 'perfect') {
       A.play(result.kind);
-      message(result.kind === 'perfect' ? '¡TOP 10 COMPLETO!' : `¡Acierto! Puesto ${result.rank + 1} · +${10 - result.rank} puntos`, 'good');
-    } else if (result.kind === 'miss') { A.play('bomb'); message('No está en este top 10. Cambia el turno.', 'bad'); }
+      message(result.kind === 'perfect' ? '¡TOP 10 COMPLETO!' : `¡Acierto! Puesto ${result.rank + 1}`, 'good');
+    } else if (result.kind === 'miss') { A.play('bomb'); message('No está en este top 10. ¡Sigan intentando!', 'bad'); }
     else if (result.kind === 'repeat') message('Esa respuesta ya se intentó. Probá otra.');
     else if (result.kind === 'empty') message('Escribí el nombre de un Pokémon.');
     $('#pokemon-answer').focus();
-  });
-  $('#pass').addEventListener('click', () => {
-    session().history.push(state()); session().state = { ...state(), turn: 1 - state().turn }; render(); message('Turno cambiado.');
   });
   $('#undo').addEventListener('click', () => { if (!session().history.length) return; session().state = session().history.pop(); render(); message('Última acción deshecha.'); });
   $('#reveal').addEventListener('click', () => { $('#reveal-confirm').showModal(); $('#cancel-reveal').focus(); });
@@ -115,8 +103,16 @@
   $('#guides').addEventListener('click', () => document.body.classList.toggle('clean'));
   $('#record').addEventListener('click', () => { document.body.classList.toggle('recording'); fit(); });
   window.addEventListener('resize', fit);
+  function togglePanel() {
+    const panel = $('#control-panel');
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) $('#close-panel').focus();
+  }
+  $('#close-panel').addEventListener('click', togglePanel);
   document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && event.target.matches('input, textarea')) { event.target.blur(); return; }
     if (event.target.matches('input, textarea') || $('#reveal-confirm').open) return;
+    if (event.key.toLowerCase() === 'p' && !event.repeat) { event.preventDefault(); togglePanel(); }
     if (event.key.toLowerCase() === 'm') $('#mute').click();
     if (event.key.toLowerCase() === 'u' && !$('#undo').disabled) $('#undo').click();
   });

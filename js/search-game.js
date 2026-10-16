@@ -14,7 +14,7 @@
       .slice(0, 10).map(p => ({ id: p[0], name: p[1], english: p[2] })));
   }
   function create(type = 0) {
-    return { type, turn: type % 2, scores: [0, 0], found: [], attempts: [], misses: [0, 0], revealed: false };
+    return { type, found: [], attempts: [], revealed: false };
   }
   function guess(state, board, input) {
     if (state.revealed || state.found.length === 10) return { kind: 'closed', state };
@@ -25,13 +25,11 @@
       (p.id === 29 && ['nidoranf', 'nidoranhembra'].includes(key)) ||
       (p.id === 32 && ['nidoranm', 'nidoranmacho'].includes(key)));
     if (rank >= 0 && state.found.includes(rank)) return { kind: 'repeat', state };
-    const next = { ...state, found: [...state.found], scores: [...state.scores], misses: [...state.misses], attempts: [...state.attempts, key], turn: 1 - state.turn };
+    const next = { ...state, found: [...state.found], attempts: [...state.attempts, key] };
     if (rank < 0) {
-      next.misses[state.turn]++;
       return { kind: 'miss', state: next };
     }
     next.found.push(rank);
-    next.scores[state.turn] += 10 - rank;
     return { kind: next.found.length === 10 ? 'perfect' : 'correct', state: next, rank };
   }
   return { normalize, rankings, create, guess };

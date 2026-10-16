@@ -162,8 +162,9 @@ tests/ game.test.mjs · net-layout.test.mjs
 # Top 10 Pokémon · búsquedas de 2026
 
 Nuevo juego: `top-10.html` (horizontal), o `top-10.html?vista=vertical`.
-Filtro de los 18 tipos, diez puestos tapados, turnos de Héctor y Guti, puntajes,
-sonidos, deshacer y revelación con confirmación. No se muestran nombres,
+Reto cooperativo sin nombres, turnos ni puntajes. Diez puestos tapados, sonidos,
+deshacer y revelación con confirmación. El panel se abre y cierra con P (fuera
+del campo de respuesta); allí están los 18 tipos y los controles de grabación. No se muestran nombres,
 sprites ni longitudes como pistas antes de acertar. Cada tipo conserva su ronda
 durante la sesión; recargar reinicia las partidas.
 
