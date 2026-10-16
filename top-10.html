@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top 10 Pokémon · Más buscados en 2026</title>
+  <link rel="stylesheet" href="css/common.css">
+  <link rel="stylesheet" href="css/search-game.css">
+</head>
+<body class="search-mode clean">
+<main id="search-reel">
+  <div class="camera-space"><span>ESPACIO PARA CÁMARAS</span></div>
+  <section id="search-game" aria-label="Top 10 Pokémon">
+    <aside class="contestant" data-player="0"><span class="active-label">JUEGA</span><h2>HÉCTOR</h2><strong class="score">0</strong><span>PUNTOS</span><small class="misses">0 fallos</small></aside>
+    <div class="play-area">
+      <header><span class="brand">TOP <b>10</b> POKÉMON</span><span class="year">GOOGLE · 2026</span></header>
+      <nav id="type-filter" aria-label="Elegir tipo"></nav>
+      <div class="prompt"><h1>Pokémon de <span id="type-title">TIPO NORMAL</span><br>más buscados en 2026</h1><p>Enero–julio · 10 puestos ocultos · ¡Adiviná el ranking!</p></div>
+      <form id="search-answer" autocomplete="off"><label for="pokemon-answer" id="turn-label">TURNO DE HÉCTOR</label><input id="pokemon-answer" name="pokemon" placeholder="Escribí un Pokémon…" maxlength="60" spellcheck="false" disabled><button type="submit" disabled>RESPONDER ↵</button><span id="found-count">0 / 10</span></form>
+      <div id="feedback" role="status" aria-live="polite">Cargando los datos. Las respuestas están ocultas.</div>
+      <ol id="ranking" aria-label="Puestos del ranking"></ol>
+      <footer><button id="pass" disabled>Pasar turno</button><button id="undo" disabled>Deshacer</button><button id="reveal" disabled>Revelar respuestas…</button><button id="next" disabled>Siguiente tipo →</button><button id="mute" aria-label="Silenciar sonidos">🔊</button><button id="layout">↕ Vertical</button><button id="guides">Cámaras</button><button id="record">Tamaño grabación</button></footer>
+      <details class="source"><summary>Fuente y reglas · sin respuestas</summary><p>Google Trends, enero–julio de 2026: promedio de interés relativo, no cantidad absoluta de búsquedas. Datos de PokéTrends (CC BY 4.0). La metodología declara consultas globales; sus metadatos también mencionan EE. UU., por lo que la cobertura geográfica del proveedor es ambigua. Se incluyen 1.021 especies con los siete meses completos; cuatro carecen de datos de 2026 y se excluyen, sin formas alternativas; los de doble tipo participan en ambos. Empates: número de Pokédex ascendente. Cada acierto da entre 10 puntos (puesto 1) y 1 punto (puesto 10). Los fallos y pases cambian el turno, sin quitar puntos. Cada tipo conserva su partida durante esta sesión.</p><p><a href="https://poke-trends.com/methodology" target="_blank" rel="noreferrer">Metodología del proveedor (puede contener spoilers)</a></p></details>
+    </div>
+    <aside class="contestant" data-player="1"><span class="active-label">JUEGA</span><h2>GUTI</h2><strong class="score">0</strong><span>PUNTOS</span><small class="misses">0 fallos</small></aside>
+  </section>
+</main>
+<dialog id="reveal-confirm"><h2>¿Revelar este top 10?</h2><p>Se mostrarán todas las respuestas de este tipo y terminará la ronda.</p><button id="cancel-reveal">Seguir jugando</button><button id="confirm-reveal">Sí, revelar respuestas</button></dialog>
+<script src="data/game-data.js"></script>
+<script src="js/letters.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/search-game.js"></script>
+<script src="js/search-app.js"></script>
+</body>
+</html>

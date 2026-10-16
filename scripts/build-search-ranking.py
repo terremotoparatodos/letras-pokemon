@@ -1,0 +1,63 @@
+"""Build the 2026 snapshot without printing answers. Python standard library only."""
+import concurrent.futures
+import datetime
+import json
+from pathlib import Path
+import time
+import urllib.request
+
+ROOT = Path(__file__).resolve().parent.parent
+CACHE = ROOT / '.search-cache'
+BASE = 'https://poke-trends.com/api/'
+
+def get_json(path):
+    for attempt in range(4):
+        try:
+            req = urllib.request.Request(BASE + path + '?v=2026-07', headers={'User-Agent': 'PokemonSearchGame/1.0'})
+            with urllib.request.urlopen(req, timeout=40) as response:
+                return json.load(response)
+        except Exception:
+            if attempt == 3:
+                raise RuntimeError('Source download failed; no ranking generated') from None
+            time.sleep(2 ** attempt)
+
+def load_series(p):
+    file = CACHE / (str(p['id']) + '.json')
+    if file.exists():
+        series = json.loads(file.read_text(encoding='utf-8'))
+    else:
+        series = get_json('trends/' + p['name'] + '.json')
+        file.write_text(json.dumps(series), encoding='utf-8')
+    months = {r['month'][:7]: float(r['value']) for r in series if r['month'].startswith('2026-')}
+    expected = [f'2026-{i:02}' for i in range(1, 8)]
+    return {'id': int(p['id']), 'months': months}
+
+if __name__ == '__main__':
+    CACHE.mkdir(exist_ok=True)
+    pokemon = get_json('pokemon.json')
+    if len(pokemon) != 1025:
+        raise RuntimeError('Unexpected source coverage')
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
+        scores = list(pool.map(load_series, pokemon))
+    complete = [p for p in scores if all(f'2026-{i:02}' in p['months'] for i in range(1, 8))]
+    print(f'Coverage check: {len(complete)} complete series out of 1025. Answers hidden.')
+    if len(complete) != 1021:
+        raise RuntimeError('Unexpected source coverage; inspect before generating')
+    scores = [{'id': p['id'], 'score': sum(p['months'][f'2026-{i:02}'] for i in range(1, 8)) / 7} for p in complete]
+    output = {
+        'meta': {
+            'title': 'Interés de búsqueda en Google durante 2026',
+            'source': 'PokéTrends · Google Trends',
+            'url': 'https://poke-trends.com/methodology',
+            'license': 'CC BY 4.0',
+            'period': '2026-01/2026-07',
+            'geography': 'Global según la metodología de la fuente; los metadatos del proveedor indican EE. UU.',
+            'method': 'Media de siete valores mensuales normalizados; ambos tipos; empates por número de Pokédex.',
+            'coverage': 1021,
+            'excluded': 4,
+            'retrieved': str(datetime.date.today()),
+        },
+        'scores': sorted(scores, key=lambda p: p['id']),
+    }
+    (ROOT / 'data' / 'search-2026.json').write_text(json.dumps(output, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    print('Snapshot complete: 1021 entries; seven months each; 4 excluded. Answers hidden.')

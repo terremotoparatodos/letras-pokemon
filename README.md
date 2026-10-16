@@ -159,3 +159,19 @@ assets/ sprites/ · fonts/ (Bungee, Press Start 2P · OFL) · img/ (fondo de Pok
 scripts/ build-data · serve · run-tests
 tests/ game.test.mjs · net-layout.test.mjs
 ```
+# Top 10 Pokémon · búsquedas de 2026
+
+Nuevo juego: `top-10.html` (horizontal), o `top-10.html?vista=vertical`.
+Filtro de los 18 tipos, diez puestos tapados, turnos de Héctor y Guti, puntajes,
+sonidos, deshacer y revelación con confirmación. No se muestran nombres,
+sprites ni longitudes como pistas antes de acertar. Cada tipo conserva su ronda
+durante la sesión; recargar reinicia las partidas.
+
+Datos: promedio de interés de Google Trends de enero a julio de 2026,
+según PokéTrends (CC BY 4.0). Cobertura: 1.021 especies; cuatro sin datos
+de 2026 se excluyen. La cobertura geográfica del proveedor es ambigua.
+Ver `data/search-2026-methodology.md` para el criterio y las limitaciones,
+sin respuestas. No abrir el proveedor ni inspeccionar los archivos si se juega
+como participante: el sitio estático oculta respuestas en pantalla, no en el código.
+
+Pruebas: `npm test`. Regeneración del conjunto: `python scripts/build-search-ranking.py`.
