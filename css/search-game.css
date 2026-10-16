@@ -43,6 +43,12 @@ body.clean .recording-banner span{visibility:hidden}
 .play-area{min-height:0}
 
 body:not(.vertical) .rank-card img{width:44px;height:44px}body:not(.vertical) .rank-name{font-size:24px}
+/* Recording: compact horizontal heading and a clear bottom safe area. */
+body:not(.vertical) .prompt h1 br{display:none}
+body:not(.vertical) #type-title{margin-right:.3em}
+body:not(.vertical) .prompt h1{white-space:nowrap;font-size:30px}
+body:not(.vertical) #search-game{padding-bottom:36px}
+body.spectator #search-answer{display:none}
 
 #spectator-controls{border-top:1px solid #596379;margin-top:12px;padding:4px 0 14px}#spectator-controls a{color:var(--gold);display:block;margin:8px 0}#spectator-url{box-sizing:border-box;width:100%;font:12px system-ui;color:#fff;background:#101827;border:1px solid #596379;border-radius:6px;padding:9px}#spectator-controls p{font-size:12px;color:#c6cedc}
 #connection-notice{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:30;border:2px solid var(--gold);border-radius:8px;padding:10px 18px;background:#101827;color:#fff;font:16px system-ui;max-width:80vw}

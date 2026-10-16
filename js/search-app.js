@@ -157,6 +157,7 @@
   layout(spectator ? params.get('vista') !== 'horizontal' : params.get('vista') === 'vertical'); updateMute(); render();
   if (spectator) {
     document.body.classList.add('spectator');
+    $('.header-meta').prepend($('#found-count'));
     $('.answer-label').textContent = 'RESPUESTA EN JUEGO';
     message(''); networkStatus('Conectando con la partida…');
     if (!window.SearchSync.validCode(spectator)) { networkStatus('Enlace de espectador inválido. Creá uno desde el panel de la partida.'); return; }
