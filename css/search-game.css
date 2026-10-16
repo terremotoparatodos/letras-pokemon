@@ -1,8 +1,8 @@
 body.search-mode{font-family:var(--pixel);color:#fff;overflow:hidden}
 #search-reel{width:1920px;height:1080px;position:absolute;left:50%;top:50%;transform-origin:center}
-.camera-space{height:390px;background:#181a20;display:flex;align-items:center;justify-content:center;color:#777;font:22px system-ui;letter-spacing:.15em}
+.camera-space{height:482px;background:#181a20;display:flex;align-items:center;justify-content:center;color:#777;font:22px system-ui;letter-spacing:.15em}
 body.clean .camera-space span{visibility:hidden}
-#search-game{height:690px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:18px 22px;background:linear-gradient(#09182299,#081412cc),url('../assets/img/nature-1768605061922-3261.jpg') center/cover}
+#search-game{height:598px;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:18px 22px;background:linear-gradient(#09182299,#081412cc),url('../assets/img/nature-1768605061922-3261.jpg') center/cover}
 .play-area{min-width:0;display:flex;flex-direction:column;gap:9px;position:relative}
 .play-area header{display:flex;justify-content:space-between;align-items:center;font-size:27px;text-shadow:2px 2px var(--ink),-2px -2px var(--ink)}
 .brand b{color:var(--gold)}.year{font-size:16px;color:var(--gold)}
@@ -41,3 +41,5 @@ body.vertical .banner-bottom{height:270px}
 body.clean .recording-banner span{visibility:hidden}
 #search-game{overflow:hidden}
 .play-area{min-height:0}
+
+body:not(.vertical) .rank-card img{width:44px;height:44px}body:not(.vertical) .rank-name{font-size:24px}

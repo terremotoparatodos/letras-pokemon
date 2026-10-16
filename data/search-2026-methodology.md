@@ -13,5 +13,5 @@
 
 Reto cooperativo sin nombres, turnos ni puntajes. Cada acierto descubre su puesto; los fallos permiten seguir intentando. El panel de tipos y controles se abre y cierra con P, fuera del campo de respuesta. Cada tipo mantiene su propia ronda durante la sesión. Recargar inicia una sesión nueva. Revelar requiere confirmación y termina esa ronda; deshacer recupera la acción anterior.
 
-Cada tipo comienza con 3 vidas; una respuesta incorrecta consume una. Repetir o enviar vacío no consume vidas. Al agotarlas termina la ronda sin revelar respuestas; deshacer restaura la vida.
+Cada tipo comienza con 5 vidas; una respuesta incorrecta consume una. Repetir o enviar vacío no consume vidas. Al agotarlas termina la ronda sin revelar respuestas; deshacer restaura la vida.
 El HTML puede abrirse directamente desde el disco: el conjunto se carga como script generado (`data/search-2026.js`), sin fetch ni servidor. JSON y JS se generan juntos desde la misma fuente.

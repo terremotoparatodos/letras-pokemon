@@ -21,7 +21,7 @@ test('cooperative guesses reveal a rank without mutating history or tracking sco
 test('misses cost one life; repeats and empty input keep state', () => {
   const miss = G.guess(G.create(), board, 'no existe');
   assert.equal(miss.kind, 'miss');
-  assert.equal(miss.state.lives, 2);
+  assert.equal(miss.state.lives, 4);
   assert.deepEqual(miss.state.attempts, ['noexiste']);
   assert.deepEqual(miss.state.found, []);
   assert.equal(G.guess(miss.state, board, 'no-existe').state, miss.state);
@@ -64,16 +64,16 @@ test('snapshot has ten valid unique entries for every type and matching local sp
   }
 });
 
-test('three misses end the round without revealing answers; lives are independent by type', () => {
+test('five misses end the round without revealing answers; lives are independent by type', () => {
   let s = G.create();
-  for (const word of ['fallo uno', 'fallo dos', 'fallo tres']) s = G.guess(s, board, word).state;
+  for (const word of ['fallo uno', 'fallo dos', 'fallo tres', 'fallo cuatro', 'fallo cinco']) s = G.guess(s, board, word).state;
   assert.equal(s.lives, 0);
   assert.equal(s.revealed, false);
   assert.deepEqual(s.found, []);
   assert.equal(G.guess(s, board, 'Test 0').kind, 'closed');
-  assert.equal(G.create(1).lives, 3);
+  assert.equal(G.create(1).lives, 5);
   const before = G.create();
   const hit = G.guess(before, board, 'Test 0');
-  assert.equal(hit.state.lives, 3);
-  assert.equal(before.lives, 3);
+  assert.equal(hit.state.lives, 5);
+  assert.equal(before.lives, 5);
 });

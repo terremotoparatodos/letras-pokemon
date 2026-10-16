@@ -36,8 +36,8 @@
   }
   function render() {
     const s = state(), finished = s.revealed || s.found.length === 10 || s.lives === 0;
-    $('#lives').textContent = '♥'.repeat(s.lives) + '♡'.repeat(3 - s.lives);
-    $('#lives').setAttribute('aria-label', `${s.lives} de 3 vidas`);
+    $('#lives').textContent = '♥'.repeat(s.lives) + '♡'.repeat(5 - s.lives);
+    $('#lives').setAttribute('aria-label', `${s.lives} de 5 vidas`);
     $('#type-title').textContent = `TIPO ${D.TYPES[selected].toUpperCase()}`;
     $('#type-title').style.color = D.TYPE_COLORS[selected];
     $('#found-count').textContent = `${s.found.length} / 10`;
@@ -129,6 +129,6 @@
     if (data.meta.period !== '2026-01/2026-07' || data.scores.length !== data.meta.coverage) throw Error('Cobertura de datos inesperada.');
     boards = G.rankings(window.LETRAS_DATA.pokemon, data.scores);
     if (boards.some(board => board.length !== 10)) throw Error('Faltan puestos del ranking.');
-    ready = true; render(); message('¡Todo listo! Las respuestas están ocultas.');
+    ready = true; render(); message('');
   } catch (error) { message(`${error.message} Recargá la página para reintentar.`, 'bad'); }
 })();

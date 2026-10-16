@@ -14,7 +14,7 @@
       .slice(0, 10).map(p => ({ id: p[0], name: p[1], english: p[2] })));
   }
   function create(type = 0) {
-    return { type, found: [], attempts: [], lives: 3, revealed: false };
+    return { type, found: [], attempts: [], lives: 5, revealed: false };
   }
   function guess(state, board, input) {
     if (state.revealed || state.found.length === 10 || state.lives === 0) return { kind: 'closed', state };

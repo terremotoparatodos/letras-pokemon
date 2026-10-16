@@ -177,5 +177,5 @@ como participante: el sitio estático oculta respuestas en pantalla, no en el c�
 
 Pruebas: `npm test`. Regeneración del conjunto: `python scripts/build-search-ranking.py`.
 
-Cada tipo comienza con 3 vidas; una respuesta incorrecta consume una. Repetir o enviar vacío no consume vidas. Al agotarlas termina la ronda sin revelar respuestas; deshacer restaura la vida.
+Cada tipo comienza con 5 vidas; una respuesta incorrecta consume una. Repetir o enviar vacío no consume vidas. Al agotarlas termina la ronda sin revelar respuestas; deshacer restaura la vida.
 El HTML puede abrirse directamente desde el disco: el conjunto se carga como script generado (`data/search-2026.js`), sin fetch ni servidor. JSON y JS se generan juntos desde la misma fuente.
